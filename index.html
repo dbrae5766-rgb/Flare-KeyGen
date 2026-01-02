@@ -363,8 +363,14 @@
                 <button class="btn btn-primary" id="generateBtn" onclick="generateKey()">
                     <span id="btnText">Generate New Key</span>
                 </button>
+                <button class="btn btn-primary" id="weekBtn" onclick="generateWeekKey()" style="display: none; margin-left: 8px; background: #3b82f6;">
+                    <span id="weekBtnText">1 Week Key</span>
+                </button>
+                <button class="btn btn-primary" id="monthBtn" onclick="generateMonthKey()" style="display: none; margin-left: 8px; background: #10b981;">
+                    <span id="monthBtnText">1 Month Key</span>
+                </button>
                 <button class="btn btn-primary" id="permanentBtn" onclick="generatePermanentKey()" style="display: none; margin-left: 8px; background: #8338ec;">
-                    <span id="permanentBtnText">Generate Permanent Key</span>
+                    <span id="permanentBtnText">Permanent Key</span>
                 </button>
 
                 <div id="keyDisplay" class="key-display">
@@ -408,7 +414,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, push, onValue, remove, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, push, onValue, remove, query, orderByChild, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         // ============================================
         // FIREBASE CONFIG
@@ -435,6 +441,7 @@
         window.dbPush = push;
         window.dbOnValue = onValue;
         window.dbRemove = remove;
+        window.dbGet = get;
 
         // Load keys on page load
         loadKeys();
@@ -446,7 +453,19 @@
     <script>
         let currentKey = '';
         const SPECIAL_IP = '69.170.112.226';
+        const COOLDOWN_MS = 21 * 60 * 60 * 1000; // 21 hours in milliseconds
         let userIP = null;
+        let userStorageKey = 'lastGeneratedKey'; // Will be personalized per user
+
+        // Generate a unique storage key for this user
+        function getUserStorageKey(suffix = '') {
+            if (userIP) {
+                // Use IP-based storage key
+                return `key_${userIP.replace(/\./g, '_')}${suffix ? '_' + suffix : ''}`;
+            }
+            // Fallback to generic key if IP not loaded yet
+            return 'lastGeneratedKey' + (suffix ? '_' + suffix : '');
+        }
 
         // Check user's IP address
         async function checkUserIP() {
@@ -455,26 +474,129 @@
                 const data = await response.json();
                 userIP = data.ip;
                 
-                // Show permanent key button if IP matches
+                // Update storage key to be user-specific
+                userStorageKey = getUserStorageKey();
+                
+                // Show all special buttons if IP matches
                 if (userIP === SPECIAL_IP) {
+                    document.getElementById('weekBtn').style.display = 'inline-flex';
+                    document.getElementById('monthBtn').style.display = 'inline-flex';
                     document.getElementById('permanentBtn').style.display = 'inline-flex';
                     console.log('Admin access granted');
                 }
+
+                // Load user's saved key after IP is determined
+                loadUserKey();
             } catch (error) {
                 console.error('Could not check IP:', error);
+                // Still try to load saved key with fallback
+                loadUserKey();
             }
         }
 
-        // Load last generated key on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            checkUserIP();
-            
-            const savedKey = localStorage.getItem('lastGeneratedKey');
+        // Load the user's saved key
+        function loadUserKey() {
+            const savedKey = localStorage.getItem(getUserStorageKey());
             if (savedKey) {
                 currentKey = savedKey;
                 document.getElementById('generatedKey').textContent = savedKey;
                 document.getElementById('keyDisplay').classList.add('active');
             }
+        }
+
+        // Check if user is on cooldown (client-side)
+        function checkCooldown() {
+            // Skip cooldown check for special IP
+            if (userIP === SPECIAL_IP) {
+                return { onCooldown: false };
+            }
+
+            const cooldownKey = getUserStorageKey('cooldown');
+            const lastGenTime = localStorage.getItem(cooldownKey);
+            if (!lastGenTime) {
+                return { onCooldown: false };
+            }
+
+            const now = Date.now();
+            const timeSinceLastGen = now - parseInt(lastGenTime);
+            const cooldownRemaining = COOLDOWN_MS - timeSinceLastGen;
+
+            if (cooldownRemaining > 0) {
+                const hoursLeft = Math.floor(cooldownRemaining / (1000 * 60 * 60));
+                const minutesLeft = Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                return {
+                    onCooldown: true,
+                    timeRemaining: `${hoursLeft}h ${minutesLeft}m`
+                };
+            }
+
+            return { onCooldown: false };
+        }
+
+        // Check if user is on cooldown (server-side in Firebase)
+        async function checkServerCooldown() {
+            // Skip cooldown check for special IP
+            if (userIP === SPECIAL_IP) {
+                return { onCooldown: false };
+            }
+
+            try {
+                const ipKey = userIP.replace(/\./g, '_');
+                const cooldownRef = window.dbRef(window.db, `cooldowns/${ipKey}`);
+                const snapshot = await window.dbGet(cooldownRef);
+
+                if (!snapshot.exists()) {
+                    return { onCooldown: false };
+                }
+
+                const data = snapshot.val();
+                const lastGenTime = data.lastGenerationTime;
+                const now = Date.now();
+                const timeSinceLastGen = now - lastGenTime;
+                const cooldownRemaining = COOLDOWN_MS - timeSinceLastGen;
+
+                if (cooldownRemaining > 0) {
+                    const hoursLeft = Math.floor(cooldownRemaining / (1000 * 60 * 60));
+                    const minutesLeft = Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    return {
+                        onCooldown: true,
+                        timeRemaining: `${hoursLeft}h ${minutesLeft}m`,
+                        lastGenTime: lastGenTime
+                    };
+                }
+
+                return { onCooldown: false };
+            } catch (error) {
+                console.error('Error checking server cooldown:', error);
+                // Fallback to client-side check if Firebase check fails
+                return checkCooldown();
+            }
+        }
+
+        // Update button states based on cooldown
+        function updateButtonStates() {
+            const cooldown = checkCooldown();
+            const btn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+
+            if (cooldown.onCooldown) {
+                btn.disabled = true;
+                btnText.textContent = `Cooldown: ${cooldown.timeRemaining}`;
+                btn.style.opacity = '0.5';
+            } else {
+                btn.disabled = false;
+                btnText.textContent = 'Generate New Key';
+                btn.style.opacity = '1';
+            }
+        }
+
+        // Load last generated key on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkUserIP().then(() => {
+                updateButtonStates();
+                // Update cooldown timer every minute
+                setInterval(updateButtonStates, 60000);
+            });
         });
 
         function generateRandomKey() {
@@ -493,7 +615,28 @@
             return key;
         }
 
-        async function generateKey(isPermanent = false) {
+        async function generateKey(keyType = 'normal') {
+            // Check cooldown (skip for special IP)
+            if (userIP !== SPECIAL_IP && keyType === 'normal') {
+                // First check client-side cooldown
+                const cooldown = checkCooldown();
+                if (cooldown.onCooldown) {
+                    showMessage(`Please wait ${cooldown.timeRemaining} before generating another key`, 'error');
+                    return;
+                }
+
+                // Then check server-side cooldown in Firebase
+                const serverCooldown = await checkServerCooldown();
+                if (serverCooldown.onCooldown) {
+                    showMessage(`Please wait ${serverCooldown.timeRemaining} before generating another key`, 'error');
+                    // Sync local storage with server time
+                    const cooldownKey = getUserStorageKey('cooldown');
+                    localStorage.setItem(cooldownKey, serverCooldown.lastGenTime.toString());
+                    updateButtonStates();
+                    return;
+                }
+            }
+
             const btn = document.getElementById('generateBtn');
             const btnText = document.getElementById('btnText');
             const keyDisplay = document.getElementById('keyDisplay');
@@ -508,9 +651,38 @@
             try {
                 const key = generateRandomKey();
                 const timestamp = Date.now();
-                const expiresAt = isPermanent ? 
-                    timestamp + (365 * 24 * 60 * 60 * 1000) : // 1 year for permanent
-                    timestamp + (24 * 60 * 60 * 1000); // 24 hours for normal
+                let expiresAt, status, badgeText, validText, badgeColor;
+
+                // Set expiration and display based on key type
+                switch (keyType) {
+                    case 'week':
+                        expiresAt = timestamp + (7 * 24 * 60 * 60 * 1000);
+                        status = 'week';
+                        badgeText = '1 WEEK';
+                        validText = 'Valid for 1 week';
+                        badgeColor = '#3b82f6'; // blue
+                        break;
+                    case 'month':
+                        expiresAt = timestamp + (30 * 24 * 60 * 60 * 1000);
+                        status = 'month';
+                        badgeText = '1 MONTH';
+                        validText = 'Valid for 1 month';
+                        badgeColor = '#10b981'; // green
+                        break;
+                    case 'permanent':
+                        expiresAt = timestamp + (365 * 24 * 60 * 60 * 1000);
+                        status = 'permanent';
+                        badgeText = 'PERMANENT';
+                        validText = 'Valid for 1 year';
+                        badgeColor = '#8338ec'; // purple
+                        break;
+                    default: // normal
+                        expiresAt = timestamp + (24 * 60 * 60 * 1000);
+                        status = 'active';
+                        badgeText = 'ACTIVE';
+                        validText = 'Valid for 24 hours';
+                        badgeColor = null; // use default green
+                }
 
                 const keyRef = window.dbPush(window.dbRef(window.db, 'keys'));
                 await window.dbSet(keyRef, {
@@ -519,41 +691,94 @@
                     expiresAt: expiresAt,
                     hwid: null,
                     activated: false,
-                    status: isPermanent ? 'permanent' : 'active'
+                    status: status,
+                    generatorIP: userIP
                 });
+
+                // Save cooldown to Firebase for server-side tracking (skip for special IP and non-normal keys)
+                if (userIP !== SPECIAL_IP && keyType === 'normal') {
+                    const ipKey = userIP.replace(/\./g, '_');
+                    const cooldownRef = window.dbRef(window.db, `cooldowns/${ipKey}`);
+                    await window.dbSet(cooldownRef, {
+                        lastGenerationTime: timestamp,
+                        ip: userIP
+                    });
+                }
 
                 currentKey = key;
                 document.getElementById('generatedKey').textContent = key;
                 keyDisplay.classList.add('active');
 
                 // Update badge and time display
-                if (isPermanent) {
-                    keyStatusBadge.innerHTML = '<span class="status-dot"></span>PERMANENT';
+                keyStatusBadge.innerHTML = `<span class="status-dot"></span>${badgeText}`;
+                keyValidTime.textContent = validText;
+                
+                if (badgeColor) {
                     keyStatusBadge.className = 'status-badge';
-                    keyStatusBadge.style.background = 'rgba(131, 56, 236, 0.15)';
-                    keyStatusBadge.style.color = '#8338ec';
-                    keyValidTime.textContent = 'Valid for 1 year';
+                    keyStatusBadge.style.background = `${badgeColor}33`; // 20% opacity
+                    keyStatusBadge.style.color = badgeColor;
                 } else {
-                    keyStatusBadge.innerHTML = '<span class="status-dot"></span>ACTIVE';
                     keyStatusBadge.className = 'status-badge status-active';
                     keyStatusBadge.style.background = '';
                     keyStatusBadge.style.color = '';
-                    keyValidTime.textContent = 'Valid for 24 hours';
                 }
 
-                // Save to localStorage so it persists across reloads
-                localStorage.setItem('lastGeneratedKey', key);
+                // Save to localStorage with user-specific key
+                localStorage.setItem(getUserStorageKey(), key);
+                
+                // Set cooldown timestamp (skip for special IP)
+                if (userIP !== SPECIAL_IP && keyType === 'normal') {
+                    const cooldownKey = getUserStorageKey('cooldown');
+                    localStorage.setItem(cooldownKey, timestamp.toString());
+                    updateButtonStates();
+                }
 
-                showMessage(isPermanent ? 'Permanent key generated successfully' : 'Key generated successfully', 'success');
+                const successMessages = {
+                    week: '1 week key generated successfully',
+                    month: '1 month key generated successfully',
+                    permanent: 'Permanent key generated successfully',
+                    normal: 'Key generated successfully'
+                };
+                showMessage(successMessages[keyType] || successMessages.normal, 'success');
                 loadKeys();
 
             } catch (error) {
                 console.error('Error generating key:', error);
                 showMessage('Error generating key. Check console for details.', 'error');
             } finally {
-                btn.disabled = false;
-                btnText.textContent = 'Generate New Key';
+                if (userIP !== SPECIAL_IP) {
+                    updateButtonStates();
+                } else {
+                    btn.disabled = false;
+                    btnText.textContent = 'Generate New Key';
+                }
             }
+        }
+
+        async function generateWeekKey() {
+            const btn = document.getElementById('weekBtn');
+            const btnText = document.getElementById('weekBtnText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            
+            await generateKey('week');
+            
+            btn.disabled = false;
+            btnText.textContent = '1 Week Key';
+        }
+
+        async function generateMonthKey() {
+            const btn = document.getElementById('monthBtn');
+            const btnText = document.getElementById('monthBtnText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            
+            await generateKey('month');
+            
+            btn.disabled = false;
+            btnText.textContent = '1 Month Key';
         }
 
         async function generatePermanentKey() {
@@ -563,10 +788,10 @@
             btn.disabled = true;
             btnText.innerHTML = '<span class="spinner"></span> Generating...';
             
-            await generateKey(true);
+            await generateKey('permanent');
             
             btn.disabled = false;
-            btnText.textContent = 'Generate Permanent Key';
+            btnText.textContent = 'Permanent Key';
         }
 
         function copyKey() {
@@ -620,25 +845,38 @@
                 keys.forEach((keyData) => {
                     const now = Date.now();
                     const isExpired = now > keyData.expiresAt;
-                    const isPermanent = keyData.status === 'permanent';
-                    const hoursLeft = Math.max(0, Math.floor((keyData.expiresAt - now) / (1000 * 60 * 60)));
-                    const minutesLeft = Math.max(0, Math.floor(((keyData.expiresAt - now) % (1000 * 60 * 60)) / (1000 * 60)));
-
+                    const timeLeft = keyData.expiresAt - now;
+                    
                     let statusBadge = '';
                     let timeText = '';
 
-                    if (isPermanent) {
-                        statusBadge = '<span class="status-badge" style="background: rgba(131, 56, 236, 0.15); color: #8338ec;"><span class="status-dot"></span>PERMANENT</span>';
-                        const daysLeft = Math.floor((keyData.expiresAt - now) / (1000 * 60 * 60 * 24));
-                        timeText = `${daysLeft} days`;
-                    } else if (isExpired) {
+                    if (isExpired) {
                         statusBadge = '<span class="status-badge status-expired"><span class="status-dot"></span>EXPIRED</span>';
                         timeText = 'Expired';
-                    } else if (keyData.activated && keyData.hwid) {
-                        statusBadge = '<span class="status-badge status-locked"><span class="status-dot"></span>LOCKED</span>';
-                        timeText = `${hoursLeft}h ${minutesLeft}m`;
+                    } else if (keyData.status === 'permanent') {
+                        statusBadge = '<span class="status-badge" style="background: rgba(131, 56, 236, 0.15); color: #8338ec;"><span class="status-dot"></span>PERMANENT</span>';
+                        const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                        timeText = `${daysLeft} days`;
+                    } else if (keyData.status === 'month') {
+                        statusBadge = '<span class="status-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><span class="status-dot"></span>1 MONTH</span>';
+                        const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                        const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        timeText = daysLeft > 0 ? `${daysLeft}d ${hoursLeft}h` : `${hoursLeft}h`;
+                    } else if (keyData.status === 'week') {
+                        statusBadge = '<span class="status-badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><span class="status-dot"></span>1 WEEK</span>';
+                        const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                        const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        timeText = daysLeft > 0 ? `${daysLeft}d ${hoursLeft}h` : `${hoursLeft}h`;
                     } else {
-                        statusBadge = '<span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span>';
+                        // Regular 24-hour key
+                        const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+                        const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        if (keyData.activated && keyData.hwid) {
+                            statusBadge = '<span class="status-badge status-locked"><span class="status-dot"></span>LOCKED</span>';
+                        } else {
+                            statusBadge = '<span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span>';
+                        }
                         timeText = `${hoursLeft}h ${minutesLeft}m`;
                     }
 
