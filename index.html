@@ -443,6 +443,16 @@
     <script>
         let currentKey = '';
 
+        // Load last generated key on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('lastGeneratedKey');
+            if (savedKey) {
+                currentKey = savedKey;
+                document.getElementById('generatedKey').textContent = savedKey;
+                document.getElementById('keyDisplay').classList.add('active');
+            }
+        });
+
         function generateRandomKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             const segments = 4;
@@ -487,6 +497,9 @@
                 currentKey = key;
                 document.getElementById('generatedKey').textContent = key;
                 keyDisplay.classList.add('active');
+
+                // Save to localStorage so it persists across reloads
+                localStorage.setItem('lastGeneratedKey', key);
 
                 showMessage('Key generated successfully', 'success');
                 loadKeys();
