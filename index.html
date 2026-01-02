@@ -19,7 +19,11 @@
             --error-red: #f87171;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -29,57 +33,321 @@
             line-height: 1.6;
         }
 
-        .header { background: var(--dark-bg); border-bottom: 1px solid var(--border-color); padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
-        .logo { width: 24px; height: 24px; background: var(--primary-orange); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .app-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
-        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
-        .section { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .section-title { font-size: 14px; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background: var(--primary-orange); color: white; }
-        .btn-primary:hover { background: #ff7f50; }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
-        .btn-secondary:hover { background: var(--hover-bg); color: var(--text-primary); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .generate-section { display: flex; flex-direction: column; align-items: center; padding: 40px 0; }
-        .key-display { width: 100%; max-width: 600px; margin-top: 24px; display: none; }
-        .key-display.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .key-box { background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; margin-bottom: 16px; }
-        .key-value { font-family: 'Courier New', monospace; font-size: 20px; color: var(--primary-orange); letter-spacing: 2px; word-break: break-all; margin-bottom: 12px; text-align: center; }
-        .key-meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
-        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        .status-active { background: rgba(74, 222, 128, 0.15); color: var(--success-green); }
-        .status-locked { background: rgba(255, 107, 53, 0.15); color: var(--primary-orange); }
-        .status-expired { background: rgba(136, 136, 136, 0.15); color: var(--text-secondary); }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-        .key-actions { display: flex; gap: 8px; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table thead { border-bottom: 1px solid var(--border-color); }
-        .table th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--border-color); }
-        .table tbody tr { transition: background 0.2s ease; }
-        .table tbody tr:hover { background: var(--hover-bg); }
-        .table tbody tr:last-child td { border-bottom: none; }
-        .key-code { font-family: 'Courier New', monospace; color: var(--primary-orange); font-size: 13px; letter-spacing: 1px; cursor: pointer; }
-        .hwid-short { font-family: 'Courier New', monospace; color: var(--text-secondary); font-size: 11px; }
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
-        .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
-        .message { padding: 12px 16px; border-radius: 6px; font-size: 13px; margin-top: 16px; display: none; align-items: center; gap: 8px; }
-        .message.success { background: rgba(74, 222, 128, 0.15); color: var(--success-green); border: 1px solid rgba(74, 222, 128, 0.3); display: flex; }
-        .message.error { background: rgba(248, 113, 113, 0.15); color: var(--error-red); border: 1px solid rgba(248, 113, 113, 0.3); display: flex; }
-        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .icon { width: 16px; height: 16px; display: inline-block; }
-        input.key-edit { font-family: 'Courier New', monospace; font-size: 13px; color: var(--primary-orange); background: var(--dark-bg); border: 1px solid var(--primary-orange); border-radius: 4px; padding: 2px 4px; width: 100%; }
+        .header {
+            background: var(--dark-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-orange);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .app-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-orange);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff7f50;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .generate-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        .key-display {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .key-display.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .key-box {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .key-value {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            color: var(--primary-orange);
+            letter-spacing: 2px;
+            word-break: break-all;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .key-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success-green);
+        }
+
+        .status-locked {
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--primary-orange);
+        }
+
+        .status-expired {
+            background: rgba(136, 136, 136, 0.15);
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .key-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .key-code {
+            font-family: 'Courier New', monospace;
+            color: var(--primary-orange);
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .hwid-short {
+            font-family: 'Courier New', monospace;
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message.success {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success-green);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            display: flex;
+        }
+
+        .message.error {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--error-red);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            display: flex;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+        }
+
         @media (max-width: 768px) {
-            .container { padding: 20px 16px; }
-            .section { padding: 16px; }
-            .table { font-size: 12px; }
-            .table th, .table td { padding: 10px 12px; }
-            .key-value { font-size: 16px; }
+            .container {
+                padding: 20px 16px;
+            }
+
+            .section {
+                padding: 16px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px 12px;
+            }
+
+            .key-value {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -146,8 +414,11 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, push, onValue, remove, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, push, onValue, remove, query, orderByChild, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
+        // ============================================
+        // FIREBASE CONFIG
+        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyAH5OnErkAOdDKYMvBTtl4F6jV_1C8Ut4Y",
             authDomain: "flare-key-gen.firebaseapp.com",
@@ -159,9 +430,11 @@
             measurementId: "G-47RJ3BJCXN"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
+        // Make functions available globally
         window.db = database;
         window.dbRef = ref;
         window.dbSet = set;
@@ -170,115 +443,556 @@
         window.dbRemove = remove;
         window.dbGet = get;
 
+        // Load keys on page load
         loadKeys();
+
+        // Set up auto-cleanup for expired keys
         setInterval(cleanupExpiredKeys, 60000);
     </script>
 
-    <!-- Full JS logic including dupe check & admin editing -->
     <script>
         let currentKey = '';
-        const SPECIAL_IPS = ['69.170.112.226', '175.37.240.44'];
-        const COOLDOWN_MS = 21 * 60 * 60 * 1000;
+        const SPECIAL_IPS = ['69.170.112.226', '175.37.240.44']; // Admin IPs with full access
+        const COOLDOWN_MS = 21 * 60 * 60 * 1000; // 21 hours in milliseconds
         let userIP = null;
-        let userStorageKey = 'lastGeneratedKey';
+        let userStorageKey = 'lastGeneratedKey'; // Will be personalized per user
 
-        function isAdminIP() { return SPECIAL_IPS.includes(userIP); }
-        function getUserStorageKey(suffix='') { return userIP ? `key_${userIP.replace(/\./g,'_')}${suffix?'_'+suffix:''}` : 'lastGeneratedKey'+(suffix?'_'+suffix:''); }
+        // Check if current IP is an admin IP
+        function isAdminIP() {
+            return SPECIAL_IPS.includes(userIP);
+        }
 
+        // Generate a unique storage key for this user
+        function getUserStorageKey(suffix = '') {
+            if (userIP) {
+                // Use IP-based storage key
+                return `key_${userIP.replace(/\./g, '_')}${suffix ? '_' + suffix : ''}`;
+            }
+            // Fallback to generic key if IP not loaded yet
+            return 'lastGeneratedKey' + (suffix ? '_' + suffix : '');
+        }
+
+        // Check user's IP address
         async function checkUserIP() {
             try {
                 const response = await fetch('https://api.ipify.org?format=json');
                 const data = await response.json();
                 userIP = data.ip;
+                
+                // Update storage key to be user-specific
                 userStorageKey = getUserStorageKey();
-                if(isAdminIP()) {
-                    document.getElementById('weekBtn').style.display='inline-flex';
-                    document.getElementById('monthBtn').style.display='inline-flex';
-                    document.getElementById('permanentBtn').style.display='inline-flex';
+                
+                // Show all special buttons if IP matches admin list
+                if (isAdminIP()) {
+                    document.getElementById('weekBtn').style.display = 'inline-flex';
+                    document.getElementById('monthBtn').style.display = 'inline-flex';
+                    document.getElementById('permanentBtn').style.display = 'inline-flex';
+                    console.log('Admin access granted');
                 }
+
+                // Load user's saved key after IP is determined
                 loadUserKey();
-            } catch (e){ console.error(e); loadUserKey(); }
+            } catch (error) {
+                console.error('Could not check IP:', error);
+                // Still try to load saved key with fallback
+                loadUserKey();
+            }
         }
 
+        // Load the user's saved key
         function loadUserKey() {
             const savedKey = localStorage.getItem(getUserStorageKey());
-            if(savedKey) { currentKey = savedKey; document.getElementById('generatedKey').textContent = savedKey; document.getElementById('keyDisplay').classList.add('active'); }
+            if (savedKey) {
+                currentKey = savedKey;
+                document.getElementById('generatedKey').textContent = savedKey;
+                document.getElementById('keyDisplay').classList.add('active');
+            }
         }
 
+        // Check if user is on cooldown (client-side)
         function checkCooldown() {
-            if(isAdminIP()) return {onCooldown:false};
-            const cooldownKey = getUserStorageKey('cooldown');
-            const lastGenTime = localStorage.getItem(cooldownKey);
-            if(!lastGenTime) return {onCooldown:false};
-            const now = Date.now();
-            const timeRemaining = COOLDOWN_MS - (now - lastGenTime);
-            if(timeRemaining>0){ const h=Math.floor(timeRemaining/(1000*60*60)), m=Math.floor((timeRemaining%(1000*60*60))/(1000*60)); return {onCooldown:true,timeRemaining:`${h}h ${m}m`}; }
-            return {onCooldown:false};
-        }
-
-        function updateButtonStates() {
-            const cooldown = checkCooldown();
-            const btn=document.getElementById('generateBtn'), btnText=document.getElementById('btnText');
-            if(cooldown.onCooldown){ btn.disabled=true; btnText.textContent=`Cooldown: ${cooldown.timeRemaining}`; btn.style.opacity='0.5'; }
-            else { btn.disabled=false; btnText.textContent='Generate New Key'; btn.style.opacity='1'; }
-        }
-
-        window.addEventListener('DOMContentLoaded',()=>{ checkUserIP().then(()=>{ updateButtonStates(); setInterval(updateButtonStates,60000); }); });
-
-        function generateRandomKey(){ const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key=''; for(let i=0;i<4;i++){ for(let j=0;j<4;j++){ key+=chars.charAt(Math.floor(Math.random()*chars.length)); } if(i<3) key+='-'; } return key; }
-
-        async function generateKey(keyType='normal'){ /* existing generation logic */ }
-
-        async function generateWeekKey(){ await generateKey('week'); }
-        async function generateMonthKey(){ await generateKey('month'); }
-        async function generatePermanentKey(){ await generateKey('permanent'); }
-
-        function copyKey(){ navigator.clipboard.writeText(currentKey).then(()=>{ showMessage('Key copied to clipboard','success'); }); }
-
-        function showMessage(text,type){ const message=document.getElementById('message'); message.textContent=text; message.className=`message ${type}`; setTimeout(()=>{message.style.display='none';},3000); }
-
-        async function checkDuplicate(newKey){
-            const snapshot = await window.dbGet(window.dbRef(window.db,'keys'));
-            let isDup=false;
-            snapshot.forEach(child=>{ if(child.val().key===newKey) isDup=true; });
-            return isDup;
-        }
-
-        async function enableKeyEdit(span,keyId){
-            if(!isAdminIP()) return;
-            const originalKey=span.textContent.trim();
-            const input=document.createElement('input'); input.className='key-edit'; input.value=originalKey;
-            span.replaceWith(input); input.focus();
-
-            async function save(){
-                const newKey=input.value.trim();
-                if(!newKey){ input.replaceWith(span); return; }
-                const isDup = await checkDuplicate(newKey);
-                if(isDup){ alert('This key already exists!'); input.focus(); return; }
-                await window.dbSet(window.dbRef(window.db, `keys/${keyId}/key`), newKey);
-                span.textContent=newKey; input.replaceWith(span);
+            // Skip cooldown check for admin IPs
+            if (isAdminIP()) {
+                return { onCooldown: false };
             }
 
-            input.addEventListener('keydown', e=>{ if(e.key==='Enter') save(); if(e.key==='Escape') input.replaceWith(span); });
-            input.addEventListener('blur', save);
+            const cooldownKey = getUserStorageKey('cooldown');
+            const lastGenTime = localStorage.getItem(cooldownKey);
+            if (!lastGenTime) {
+                return { onCooldown: false };
+            }
+
+            const now = Date.now();
+            const timeSinceLastGen = now - parseInt(lastGenTime);
+            const cooldownRemaining = COOLDOWN_MS - timeSinceLastGen;
+
+            if (cooldownRemaining > 0) {
+                const hoursLeft = Math.floor(cooldownRemaining / (1000 * 60 * 60));
+                const minutesLeft = Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                return {
+                    onCooldown: true,
+                    timeRemaining: `${hoursLeft}h ${minutesLeft}m`
+                };
+            }
+
+            return { onCooldown: false };
         }
 
-        const originalLoadKeys=loadKeys;
-        loadKeys=function(){
-            originalLoadKeys();
-            setTimeout(()=>{
-                if(!isAdminIP()) return;
-                const keySpans=document.querySelectorAll('.key-code');
-                keySpans.forEach(span=>{
-                    span.ondblclick=function(){
-                        const keyId=span.closest('tr')?.dataset.keyId;
-                        if(keyId) enableKeyEdit(span,keyId);
+        // Check if user is on cooldown (server-side in Firebase)
+        async function checkServerCooldown() {
+            // Skip cooldown check for admin IPs
+            if (isAdminIP()) {
+                return { onCooldown: false };
+            }
+
+            try {
+                const ipKey = userIP.replace(/\./g, '_');
+                const cooldownRef = window.dbRef(window.db, `cooldowns/${ipKey}`);
+                const snapshot = await window.dbGet(cooldownRef);
+
+                if (!snapshot.exists()) {
+                    return { onCooldown: false };
+                }
+
+                const data = snapshot.val();
+                const lastGenTime = data.lastGenerationTime;
+                const now = Date.now();
+                const timeSinceLastGen = now - lastGenTime;
+                const cooldownRemaining = COOLDOWN_MS - timeSinceLastGen;
+
+                if (cooldownRemaining > 0) {
+                    const hoursLeft = Math.floor(cooldownRemaining / (1000 * 60 * 60));
+                    const minutesLeft = Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    return {
+                        onCooldown: true,
+                        timeRemaining: `${hoursLeft}h ${minutesLeft}m`,
+                        lastGenTime: lastGenTime
                     };
-                });
-            },500);
+                }
+
+                return { onCooldown: false };
+            } catch (error) {
+                console.error('Error checking server cooldown:', error);
+                // Fallback to client-side check if Firebase check fails
+                return checkCooldown();
+            }
         }
 
-        async function cleanupExpiredKeys(){ /* your existing cleanup code */ }
+        // Update button states based on cooldown
+        function updateButtonStates() {
+            const cooldown = checkCooldown();
+            const btn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+
+            if (cooldown.onCooldown) {
+                btn.disabled = true;
+                btnText.textContent = `Cooldown: ${cooldown.timeRemaining}`;
+                btn.style.opacity = '0.5';
+            } else {
+                btn.disabled = false;
+                btnText.textContent = 'Generate New Key';
+                btn.style.opacity = '1';
+            }
+        }
+
+        // Load last generated key on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkUserIP().then(() => {
+                updateButtonStates();
+                // Update cooldown timer every minute
+                setInterval(updateButtonStates, 60000);
+            });
+        });
+
+        function generateRandomKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const segments = 4;
+            const segmentLength = 4;
+            let key = '';
+
+            for (let i = 0; i < segments; i++) {
+                for (let j = 0; j < segmentLength; j++) {
+                    key += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < segments - 1) key += '-';
+            }
+
+            return key;
+        }
+
+        async function generateKey(keyType = 'normal') {
+            // Check cooldown (skip for admin IPs)
+            if (!isAdminIP() && keyType === 'normal') {
+                // First check client-side cooldown
+                const cooldown = checkCooldown();
+                if (cooldown.onCooldown) {
+                    showMessage(`Please wait ${cooldown.timeRemaining} before generating another key`, 'error');
+                    return;
+                }
+
+                // Then check server-side cooldown in Firebase
+                const serverCooldown = await checkServerCooldown();
+                if (serverCooldown.onCooldown) {
+                    showMessage(`Please wait ${serverCooldown.timeRemaining} before generating another key`, 'error');
+                    // Sync local storage with server time
+                    const cooldownKey = getUserStorageKey('cooldown');
+                    localStorage.setItem(cooldownKey, serverCooldown.lastGenTime.toString());
+                    updateButtonStates();
+                    return;
+                }
+            }
+
+            const btn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+            const keyDisplay = document.getElementById('keyDisplay');
+            const message = document.getElementById('message');
+            const keyStatusBadge = document.getElementById('keyStatusBadge');
+            const keyValidTime = document.getElementById('keyValidTime');
+
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            message.style.display = 'none';
+
+            try {
+                const key = generateRandomKey();
+                const timestamp = Date.now();
+                let expiresAt, status, badgeText, validText, badgeColor;
+
+                // Set expiration and display based on key type
+                switch (keyType) {
+                    case 'week':
+                        expiresAt = timestamp + (7 * 24 * 60 * 60 * 1000);
+                        status = 'week';
+                        badgeText = '1 WEEK';
+                        validText = 'Valid for 1 week';
+                        badgeColor = '#3b82f6'; // blue
+                        break;
+                    case 'month':
+                        expiresAt = timestamp + (30 * 24 * 60 * 60 * 1000);
+                        status = 'month';
+                        badgeText = '1 MONTH';
+                        validText = 'Valid for 1 month';
+                        badgeColor = '#10b981'; // green
+                        break;
+                    case 'permanent':
+                        expiresAt = timestamp + (365 * 24 * 60 * 60 * 1000);
+                        status = 'permanent';
+                        badgeText = 'PERMANENT';
+                        validText = 'Valid for 1 year';
+                        badgeColor = '#8338ec'; // purple
+                        break;
+                    default: // normal
+                        expiresAt = timestamp + (24 * 60 * 60 * 1000);
+                        status = 'active';
+                        badgeText = 'ACTIVE';
+                        validText = 'Valid for 24 hours';
+                        badgeColor = null; // use default green
+                }
+
+                const keyRef = window.dbPush(window.dbRef(window.db, 'keys'));
+                await window.dbSet(keyRef, {
+                    key: key,
+                    createdAt: timestamp,
+                    expiresAt: expiresAt,
+                    hwid: null,
+                    activated: false,
+                    status: status,
+                    generatorIP: userIP
+                });
+
+                // Save cooldown to Firebase for server-side tracking (skip for admin IPs and non-normal keys)
+                if (!isAdminIP() && keyType === 'normal') {
+                    const ipKey = userIP.replace(/\./g, '_');
+                    const cooldownRef = window.dbRef(window.db, `cooldowns/${ipKey}`);
+                    await window.dbSet(cooldownRef, {
+                        lastGenerationTime: timestamp,
+                        ip: userIP
+                    });
+                }
+
+                currentKey = key;
+                document.getElementById('generatedKey').textContent = key;
+                keyDisplay.classList.add('active');
+
+                // Update badge and time display
+                keyStatusBadge.innerHTML = `<span class="status-dot"></span>${badgeText}`;
+                keyValidTime.textContent = validText;
+                
+                if (badgeColor) {
+                    keyStatusBadge.className = 'status-badge';
+                    keyStatusBadge.style.background = `${badgeColor}33`; // 20% opacity
+                    keyStatusBadge.style.color = badgeColor;
+                } else {
+                    keyStatusBadge.className = 'status-badge status-active';
+                    keyStatusBadge.style.background = '';
+                    keyStatusBadge.style.color = '';
+                }
+
+                // Save to localStorage with user-specific key
+                localStorage.setItem(getUserStorageKey(), key);
+                
+                // Set cooldown timestamp (skip for admin IPs)
+                if (!isAdminIP() && keyType === 'normal') {
+                    const cooldownKey = getUserStorageKey('cooldown');
+                    localStorage.setItem(cooldownKey, timestamp.toString());
+                    updateButtonStates();
+                }
+
+                const successMessages = {
+                    week: '1 week key generated successfully',
+                    month: '1 month key generated successfully',
+                    permanent: 'Permanent key generated successfully',
+                    normal: 'Key generated successfully'
+                };
+                showMessage(successMessages[keyType] || successMessages.normal, 'success');
+                loadKeys();
+
+            } catch (error) {
+                console.error('Error generating key:', error);
+                showMessage('Error generating key. Check console for details.', 'error');
+            } finally {
+                if (!isAdminIP()) {
+                    updateButtonStates();
+                } else {
+                    btn.disabled = false;
+                    btnText.textContent = 'Generate New Key';
+                }
+            }
+        }
+
+        async function generateWeekKey() {
+            const btn = document.getElementById('weekBtn');
+            const btnText = document.getElementById('weekBtnText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            
+            await generateKey('week');
+            
+            btn.disabled = false;
+            btnText.textContent = '1 Week Key';
+        }
+
+        async function generateMonthKey() {
+            const btn = document.getElementById('monthBtn');
+            const btnText = document.getElementById('monthBtnText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            
+            await generateKey('month');
+            
+            btn.disabled = false;
+            btnText.textContent = '1 Month Key';
+        }
+
+        async function generatePermanentKey() {
+            const btn = document.getElementById('permanentBtn');
+            const btnText = document.getElementById('permanentBtnText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            
+            await generateKey('permanent');
+            
+            btn.disabled = false;
+            btnText.textContent = 'Permanent Key';
+        }
+
+        function copyKey() {
+            navigator.clipboard.writeText(currentKey).then(() => {
+                showMessage('Key copied to clipboard', 'success');
+            });
+        }
+
+        function loadKeys() {
+            const keysRef = window.dbRef(window.db, 'keys');
+            window.dbOnValue(keysRef, (snapshot) => {
+                const keysList = document.getElementById('keysList');
+                keysList.innerHTML = '';
+
+                const keys = [];
+                snapshot.forEach((childSnapshot) => {
+                    const keyData = childSnapshot.val();
+                    keyData.id = childSnapshot.key;
+                    
+                    // Filter: Only show keys generated by this user's IP
+                    // Exception: Admin IPs can see all keys
+                    if (isAdminIP() || keyData.generatorIP === userIP) {
+                        keys.push(keyData);
+                    }
+                });
+
+                keys.sort((a, b) => b.createdAt - a.createdAt);
+
+                if (keys.length === 0) {
+                    keysList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔑</div>
+                            <div>No keys generated yet</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const table = document.createElement('table');
+                table.className = 'table';
+                
+                // Show generator IP column and actions column for admins
+                const ipColumn = isAdminIP() ? '<th>Generator IP</th>' : '';
+                const actionsColumn = isAdminIP() ? '<th>Actions</th>' : '';
+                
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Status</th>
+                            <th>Time Remaining</th>
+                            <th>HWID</th>
+                            ${ipColumn}
+                            ${actionsColumn}
+                        </tr>
+                    </thead>
+                    <tbody id="keysTableBody"></tbody>
+                `;
+                keysList.appendChild(table);
+
+                const tbody = document.getElementById('keysTableBody');
+
+                keys.forEach((keyData) => {
+                    const now = Date.now();
+                    const isExpired = now > keyData.expiresAt;
+                    const timeLeft = keyData.expiresAt - now;
+                    
+                    let statusBadge = '';
+                    let timeText = '';
+
+                    if (isExpired) {
+                        statusBadge = '<span class="status-badge status-expired"><span class="status-dot"></span>EXPIRED</span>';
+                        timeText = 'Expired';
+                    } else if (keyData.status === 'permanent') {
+                        statusBadge = '<span class="status-badge" style="background: rgba(131, 56, 236, 0.15); color: #8338ec;"><span class="status-dot"></span>PERMANENT</span>';
+                        const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                        timeText = `${daysLeft} days`;
+                    } else if (keyData.status === 'month') {
+                        statusBadge = '<span class="status-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><span class="status-dot"></span>1 MONTH</span>';
+                        const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                        const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        timeText = daysLeft > 0 ? `${daysLeft}d ${hoursLeft}h` : `${hoursLeft}h`;
+                    } else if (keyData.status === 'week') {
+                        statusBadge = '<span class="status-badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><span class="status-dot"></span>1 WEEK</span>';
+                        const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                        const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        timeText = daysLeft > 0 ? `${daysLeft}d ${hoursLeft}h` : `${hoursLeft}h`;
+                    } else {
+                        // Regular 24-hour key
+                        const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+                        const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        if (keyData.activated && keyData.hwid) {
+                            statusBadge = '<span class="status-badge status-locked"><span class="status-dot"></span>LOCKED</span>';
+                        } else {
+                            statusBadge = '<span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span>';
+                        }
+                        timeText = `${hoursLeft}h ${minutesLeft}m`;
+                    }
+
+                    const hwidText = keyData.hwid ? 
+                        `<span class="hwid-short">${keyData.hwid.substring(0, 12)}...</span>` : 
+                        '<span style="color: var(--text-secondary);">Not activated</span>';
+
+                    // Show generator IP column for admins
+                    const ipCell = isAdminIP() ? 
+                        `<td><span style="color: var(--text-secondary); font-size: 12px;">${keyData.generatorIP || 'Unknown'}</span></td>` : 
+                        '';
+
+                    // Show delete button only for keys created by this admin
+                    let actionsCell = '';
+                    if (isAdminIP()) {
+                        // Admins can only delete keys they created
+                        if (keyData.generatorIP === userIP) {
+                            actionsCell = `
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; background: rgba(248, 113, 113, 0.1); border-color: #f87171; color: #f87171;" onclick="deleteKey('${keyData.id}', '${keyData.key}')">
+                                        <svg style="width: 14px; height: 14px; display: inline;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </td>
+                            `;
+                        } else {
+                            actionsCell = '<td><span style="color: var(--text-secondary); font-size: 12px;">—</span></td>';
+                        }
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="key-code">${keyData.key}</span></td>
+                        <td>${statusBadge}</td>
+                        <td>${timeText}</td>
+                        <td>${hwidText}</td>
+                        ${ipCell}
+                        ${actionsCell}
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        // Delete a key (admin only, own keys only)
+        async function deleteKey(keyId, keyValue) {
+            if (!isAdminIP()) {
+                showMessage('Only admins can delete keys', 'error');
+                return;
+            }
+
+            // Confirm deletion
+            if (!confirm(`Are you sure you want to delete key ${keyValue}?`)) {
+                return;
+            }
+
+            try {
+                const keyRef = window.dbRef(window.db, `keys/${keyId}`);
+                await window.dbRemove(keyRef);
+                
+                showMessage('Key deleted successfully', 'success');
+                
+                // If this was the current displayed key, hide the display
+                if (currentKey === keyValue) {
+                    document.getElementById('keyDisplay').classList.remove('active');
+                    localStorage.removeItem(getUserStorageKey());
+                    currentKey = '';
+                }
+                
+                // Keys will auto-reload due to onValue listener
+            } catch (error) {
+                console.error('Error deleting key:', error);
+                showMessage('Error deleting key. Check console for details.', 'error');
+            }
+        }
+
+        function cleanupExpiredKeys() {
+            const keysRef = window.dbRef(window.db, 'keys');
+            window.dbOnValue(keysRef, (snapshot) => {
+                const now = Date.now();
+                snapshot.forEach((childSnapshot) => {
+                    const keyData = childSnapshot.val();
+                    if (now > keyData.expiresAt) {
+                        window.dbRemove(window.dbRef(window.db, `keys/${childSnapshot.key}`));
+                    }
+                });
+            }, { onlyOnce: true });
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
     </script>
 </body>
 </html>
