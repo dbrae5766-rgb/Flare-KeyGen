@@ -363,16 +363,19 @@
                 <button class="btn btn-primary" id="generateBtn" onclick="generateKey()">
                     <span id="btnText">Generate New Key</span>
                 </button>
+                <button class="btn btn-primary" id="permanentBtn" onclick="generatePermanentKey()" style="display: none; margin-left: 8px; background: #8338ec;">
+                    <span id="permanentBtnText">Generate Permanent Key</span>
+                </button>
 
                 <div id="keyDisplay" class="key-display">
                     <div class="key-box">
                         <div class="key-value" id="generatedKey"></div>
                         <div class="key-meta">
-                            <span class="status-badge status-active">
+                            <span class="status-badge status-active" id="keyStatusBadge">
                                 <span class="status-dot"></span>
                                 ACTIVE
                             </span>
-                            <span>Valid for 24 hours</span>
+                            <span id="keyValidTime">Valid for 24 hours</span>
                         </div>
                         <div class="key-actions">
                             <button class="btn btn-secondary" onclick="copyKey()">
@@ -442,9 +445,30 @@
 
     <script>
         let currentKey = '';
+        const SPECIAL_IP = '69.170.112.226';
+        let userIP = null;
+
+        // Check user's IP address
+        async function checkUserIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                userIP = data.ip;
+                
+                // Show permanent key button if IP matches
+                if (userIP === SPECIAL_IP) {
+                    document.getElementById('permanentBtn').style.display = 'inline-flex';
+                    console.log('Admin access granted');
+                }
+            } catch (error) {
+                console.error('Could not check IP:', error);
+            }
+        }
 
         // Load last generated key on page load
         window.addEventListener('DOMContentLoaded', () => {
+            checkUserIP();
+            
             const savedKey = localStorage.getItem('lastGeneratedKey');
             if (savedKey) {
                 currentKey = savedKey;
@@ -469,11 +493,13 @@
             return key;
         }
 
-        async function generateKey() {
+        async function generateKey(isPermanent = false) {
             const btn = document.getElementById('generateBtn');
             const btnText = document.getElementById('btnText');
             const keyDisplay = document.getElementById('keyDisplay');
             const message = document.getElementById('message');
+            const keyStatusBadge = document.getElementById('keyStatusBadge');
+            const keyValidTime = document.getElementById('keyValidTime');
 
             btn.disabled = true;
             btnText.innerHTML = '<span class="spinner"></span> Generating...';
@@ -482,7 +508,9 @@
             try {
                 const key = generateRandomKey();
                 const timestamp = Date.now();
-                const expiresAt = timestamp + (24 * 60 * 60 * 1000);
+                const expiresAt = isPermanent ? 
+                    timestamp + (365 * 24 * 60 * 60 * 1000) : // 1 year for permanent
+                    timestamp + (24 * 60 * 60 * 1000); // 24 hours for normal
 
                 const keyRef = window.dbPush(window.dbRef(window.db, 'keys'));
                 await window.dbSet(keyRef, {
@@ -491,17 +519,32 @@
                     expiresAt: expiresAt,
                     hwid: null,
                     activated: false,
-                    status: 'active'
+                    status: isPermanent ? 'permanent' : 'active'
                 });
 
                 currentKey = key;
                 document.getElementById('generatedKey').textContent = key;
                 keyDisplay.classList.add('active');
 
+                // Update badge and time display
+                if (isPermanent) {
+                    keyStatusBadge.innerHTML = '<span class="status-dot"></span>PERMANENT';
+                    keyStatusBadge.className = 'status-badge';
+                    keyStatusBadge.style.background = 'rgba(131, 56, 236, 0.15)';
+                    keyStatusBadge.style.color = '#8338ec';
+                    keyValidTime.textContent = 'Valid for 1 year';
+                } else {
+                    keyStatusBadge.innerHTML = '<span class="status-dot"></span>ACTIVE';
+                    keyStatusBadge.className = 'status-badge status-active';
+                    keyStatusBadge.style.background = '';
+                    keyStatusBadge.style.color = '';
+                    keyValidTime.textContent = 'Valid for 24 hours';
+                }
+
                 // Save to localStorage so it persists across reloads
                 localStorage.setItem('lastGeneratedKey', key);
 
-                showMessage('Key generated successfully', 'success');
+                showMessage(isPermanent ? 'Permanent key generated successfully' : 'Key generated successfully', 'success');
                 loadKeys();
 
             } catch (error) {
@@ -511,6 +554,19 @@
                 btn.disabled = false;
                 btnText.textContent = 'Generate New Key';
             }
+        }
+
+        async function generatePermanentKey() {
+            const btn = document.getElementById('permanentBtn');
+            const btnText = document.getElementById('permanentBtnText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            
+            await generateKey(true);
+            
+            btn.disabled = false;
+            btnText.textContent = 'Generate Permanent Key';
         }
 
         function copyKey() {
@@ -564,13 +620,18 @@
                 keys.forEach((keyData) => {
                     const now = Date.now();
                     const isExpired = now > keyData.expiresAt;
+                    const isPermanent = keyData.status === 'permanent';
                     const hoursLeft = Math.max(0, Math.floor((keyData.expiresAt - now) / (1000 * 60 * 60)));
                     const minutesLeft = Math.max(0, Math.floor(((keyData.expiresAt - now) % (1000 * 60 * 60)) / (1000 * 60)));
 
                     let statusBadge = '';
                     let timeText = '';
 
-                    if (isExpired) {
+                    if (isPermanent) {
+                        statusBadge = '<span class="status-badge" style="background: rgba(131, 56, 236, 0.15); color: #8338ec;"><span class="status-dot"></span>PERMANENT</span>';
+                        const daysLeft = Math.floor((keyData.expiresAt - now) / (1000 * 60 * 60 * 24));
+                        timeText = `${daysLeft} days`;
+                    } else if (isExpired) {
                         statusBadge = '<span class="status-badge status-expired"><span class="status-dot"></span>EXPIRED</span>';
                         timeText = 'Expired';
                     } else if (keyData.activated && keyData.hwid) {
