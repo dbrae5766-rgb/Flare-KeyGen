@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flare - License Key Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #ff6b35;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #0f0f0f;
+            --card-bg: #252525;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --border-color: #333333;
+            --hover-bg: #2a2a2a;
+            --success-green: #4ade80;
+            --error-red: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--darker-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--dark-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-orange);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .app-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-orange);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff7f50;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .generate-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        .key-display {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .key-display.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .key-box {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .key-value {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            color: var(--primary-orange);
+            letter-spacing: 2px;
+            word-break: break-all;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .key-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success-green);
+        }
+
+        .status-locked {
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--primary-orange);
+        }
+
+        .status-expired {
+            background: rgba(136, 136, 136, 0.15);
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .key-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .key-code {
+            font-family: 'Courier New', monospace;
+            color: var(--primary-orange);
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .hwid-short {
+            font-family: 'Courier New', monospace;
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message.success {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success-green);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            display: flex;
+        }
+
+        .message.error {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--error-red);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            display: flex;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .section {
+                padding: 16px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px 12px;
+            }
+
+            .key-value {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo"></div>
+        <div class="app-title">Flare License Key Generator</div>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <div class="generate-section">
+                <button class="btn btn-primary" id="generateBtn" onclick="generateKey()">
+                    <span id="btnText">Generate New Key</span>
+                </button>
+
+                <div id="keyDisplay" class="key-display">
+                    <div class="key-box">
+                        <div class="key-value" id="generatedKey"></div>
+                        <div class="key-meta">
+                            <span class="status-badge status-active">
+                                <span class="status-dot"></span>
+                                ACTIVE
+                            </span>
+                            <span>Valid for 24 hours</span>
+                        </div>
+                        <div class="key-actions">
+                            <button class="btn btn-secondary" onclick="copyKey()">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Copy Key
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="message" class="message"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Active Keys</div>
+            </div>
+            <div id="keysList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔑</div>
+                    <div>No keys generated yet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, push, onValue, remove, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // ============================================
+        // REPLACE WITH YOUR FIREBASE CONFIG
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Make functions available globally
+        window.db = database;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbPush = push;
+        window.dbOnValue = onValue;
+        window.dbRemove = remove;
+
+        // Load keys on page load
+        loadKeys();
+
+        // Set up auto-cleanup for expired keys
+        setInterval(cleanupExpiredKeys, 60000);
+    </script>
+
+    <script>
+        let currentKey = '';
+
+        function generateRandomKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const segments = 4;
+            const segmentLength = 4;
+            let key = '';
+
+            for (let i = 0; i < segments; i++) {
+                for (let j = 0; j < segmentLength; j++) {
+                    key += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < segments - 1) key += '-';
+            }
+
+            return key;
+        }
+
+        async function generateKey() {
+            const btn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+            const keyDisplay = document.getElementById('keyDisplay');
+            const message = document.getElementById('message');
+
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Generating...';
+            message.style.display = 'none';
+
+            try {
+                const key = generateRandomKey();
+                const timestamp = Date.now();
+                const expiresAt = timestamp + (24 * 60 * 60 * 1000);
+
+                const keyRef = window.dbPush(window.dbRef(window.db, 'keys'));
+                await window.dbSet(keyRef, {
+                    key: key,
+                    createdAt: timestamp,
+                    expiresAt: expiresAt,
+                    hwid: null,
+                    activated: false,
+                    status: 'active'
+                });
+
+                currentKey = key;
+                document.getElementById('generatedKey').textContent = key;
+                keyDisplay.classList.add('active');
+
+                showMessage('Key generated successfully', 'success');
+                loadKeys();
+
+            } catch (error) {
+                console.error('Error generating key:', error);
+                showMessage('Error generating key. Check console for details.', 'error');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Generate New Key';
+            }
+        }
+
+        function copyKey() {
+            navigator.clipboard.writeText(currentKey).then(() => {
+                showMessage('Key copied to clipboard', 'success');
+            });
+        }
+
+        function loadKeys() {
+            const keysRef = window.dbRef(window.db, 'keys');
+            window.dbOnValue(keysRef, (snapshot) => {
+                const keysList = document.getElementById('keysList');
+                keysList.innerHTML = '';
+
+                const keys = [];
+                snapshot.forEach((childSnapshot) => {
+                    const keyData = childSnapshot.val();
+                    keyData.id = childSnapshot.key;
+                    keys.push(keyData);
+                });
+
+                keys.sort((a, b) => b.createdAt - a.createdAt);
+
+                if (keys.length === 0) {
+                    keysList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔑</div>
+                            <div>No keys generated yet</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const table = document.createElement('table');
+                table.className = 'table';
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Status</th>
+                            <th>Time Remaining</th>
+                            <th>HWID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keysTableBody"></tbody>
+                `;
+                keysList.appendChild(table);
+
+                const tbody = document.getElementById('keysTableBody');
+
+                keys.forEach((keyData) => {
+                    const now = Date.now();
+                    const isExpired = now > keyData.expiresAt;
+                    const hoursLeft = Math.max(0, Math.floor((keyData.expiresAt - now) / (1000 * 60 * 60)));
+                    const minutesLeft = Math.max(0, Math.floor(((keyData.expiresAt - now) % (1000 * 60 * 60)) / (1000 * 60)));
+
+                    let statusBadge = '';
+                    let timeText = '';
+
+                    if (isExpired) {
+                        statusBadge = '<span class="status-badge status-expired"><span class="status-dot"></span>EXPIRED</span>';
+                        timeText = 'Expired';
+                    } else if (keyData.activated && keyData.hwid) {
+                        statusBadge = '<span class="status-badge status-locked"><span class="status-dot"></span>LOCKED</span>';
+                        timeText = `${hoursLeft}h ${minutesLeft}m`;
+                    } else {
+                        statusBadge = '<span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span>';
+                        timeText = `${hoursLeft}h ${minutesLeft}m`;
+                    }
+
+                    const hwidText = keyData.hwid ? 
+                        `<span class="hwid-short">${keyData.hwid.substring(0, 12)}...</span>` : 
+                        '<span style="color: var(--text-secondary);">Not activated</span>';
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="key-code">${keyData.key}</span></td>
+                        <td>${statusBadge}</td>
+                        <td>${timeText}</td>
+                        <td>${hwidText}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        function cleanupExpiredKeys() {
+            const keysRef = window.dbRef(window.db, 'keys');
+            window.dbOnValue(keysRef, (snapshot) => {
+                const now = Date.now();
+                snapshot.forEach((childSnapshot) => {
+                    const keyData = childSnapshot.val();
+                    if (now > keyData.expiresAt) {
+                        window.dbRemove(window.dbRef(window.db, `keys/${childSnapshot.key}`));
+                    }
+                });
+            }, { onlyOnce: true });
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
