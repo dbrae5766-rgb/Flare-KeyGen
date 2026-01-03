@@ -1169,6 +1169,17 @@
 
                 const tbody = document.getElementById('keysTableBody');
 
+                // Add event listener for edit buttons
+                tbody.addEventListener('click', (e) => {
+                    const editBtn = e.target.closest('.edit-key-btn');
+                    if (editBtn) {
+                        const row = editBtn.closest('tr');
+                        const keyData = JSON.parse(row.dataset.keyData);
+                        const keyId = editBtn.dataset.keyId;
+                        editKey(keyId, keyData);
+                    }
+                });
+
                 keys.forEach((keyData) => {
                     const now = Date.now();
                     const isExpired = now > keyData.expiresAt;
@@ -1221,12 +1232,10 @@
                     if (isAdminIP()) {
                         // Admins can only edit/delete keys they created
                         if (keyData.generatorIP === userIP) {
-                            // Escape the keyData JSON for onclick attribute
-                            const escapedKeyData = JSON.stringify(keyData).replace(/"/g, '&quot;');
                             actionsCell = `
                                 <td>
                                     <div style="display: flex; gap: 8px;">
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; color: #3b82f6;" onclick='editKey("${keyData.id}", "${escapedKeyData}")'>
+                                        <button class="btn btn-secondary edit-key-btn" style="padding: 6px 12px; font-size: 12px; background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; color: #3b82f6;" data-key-id="${keyData.id}">
                                             <svg style="width: 14px; height: 14px; display: inline;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
@@ -1255,6 +1264,10 @@
                         ${ipCell}
                         ${actionsCell}
                     `;
+                    
+                    // Store keyData on the row for easy access
+                    row.dataset.keyData = JSON.stringify(keyData);
+                    
                     tbody.appendChild(row);
                 });
             });
