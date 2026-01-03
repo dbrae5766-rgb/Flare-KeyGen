@@ -327,6 +327,136 @@
             display: inline-block;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        .form-input[readonly] {
+            background: var(--darker-bg);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px 16px;
@@ -411,10 +541,69 @@
         </div>
     </div>
 
+    <!-- Edit Key Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit License Key</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm" onsubmit="saveKeyEdit(event)">
+                <div class="form-group">
+                    <label class="form-label">Key</label>
+                    <input type="text" class="form-input" id="editKeyValue" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="editKeyStatus" onchange="toggleCustomDuration()">
+                        <option value="active">Active (24 hours)</option>
+                        <option value="week">1 Week</option>
+                        <option value="month">1 Month</option>
+                        <option value="permanent">Permanent (1 year)</option>
+                        <option value="custom">Custom Duration</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customDurationGroup" style="display: none;">
+                    <label class="form-label">Custom Duration</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                        <div>
+                            <input type="number" class="form-input" id="editDurationDays" placeholder="Days" min="0" value="0">
+                            <label style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: block;">Days</label>
+                        </div>
+                        <div>
+                            <input type="number" class="form-input" id="editDurationHours" placeholder="Hours" min="0" max="23" value="0">
+                            <label style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: block;">Hours</label>
+                        </div>
+                        <div>
+                            <input type="number" class="form-input" id="editDurationMinutes" placeholder="Minutes" min="0" max="59" value="0">
+                            <label style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: block;">Minutes</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">HWID (Hardware ID)</label>
+                    <input type="text" class="form-input" id="editKeyHWID" placeholder="Not activated">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Activated</label>
+                    <select class="form-select" id="editKeyActivated">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                <input type="hidden" id="editKeyId">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, push, onValue, remove, query, orderByChild, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, push, onValue, remove, query, orderByChild, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         // ============================================
         // FIREBASE CONFIG
@@ -442,6 +631,7 @@
         window.dbOnValue = onValue;
         window.dbRemove = remove;
         window.dbGet = get;
+        window.dbUpdate = update;
 
         // Load keys on page load
         loadKeys();
@@ -805,6 +995,126 @@
             });
         }
 
+        // Toggle custom duration fields visibility
+        function toggleCustomDuration() {
+            const status = document.getElementById('editKeyStatus').value;
+            const customGroup = document.getElementById('customDurationGroup');
+            
+            if (status === 'custom') {
+                customGroup.style.display = 'block';
+            } else {
+                customGroup.style.display = 'none';
+            }
+        }
+
+        // Open edit modal
+        function editKey(keyId, keyData) {
+            if (!isAdminIP()) {
+                showMessage('Only admins can edit keys', 'error');
+                return;
+            }
+
+            // Parse the keyData if it's a string
+            if (typeof keyData === 'string') {
+                keyData = JSON.parse(keyData.replace(/&apos;/g, "'"));
+            }
+
+            document.getElementById('editKeyId').value = keyId;
+            document.getElementById('editKeyValue').value = keyData.key;
+            document.getElementById('editKeyStatus').value = keyData.status || 'active';
+            document.getElementById('editKeyHWID').value = keyData.hwid || '';
+            document.getElementById('editKeyActivated').value = keyData.activated ? 'true' : 'false';
+            
+            // Reset custom duration fields
+            document.getElementById('editDurationDays').value = '0';
+            document.getElementById('editDurationHours').value = '0';
+            document.getElementById('editDurationMinutes').value = '0';
+            
+            // Show/hide custom duration based on status
+            toggleCustomDuration();
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // Save key edit
+        async function saveKeyEdit(event) {
+            event.preventDefault();
+            
+            const keyId = document.getElementById('editKeyId').value;
+            const status = document.getElementById('editKeyStatus').value;
+            const hwid = document.getElementById('editKeyHWID').value.trim();
+            const activated = document.getElementById('editKeyActivated').value === 'true';
+            
+            try {
+                const timestamp = Date.now();
+                let expiresAt;
+                
+                // Calculate new expiration based on status
+                if (status === 'custom') {
+                    const days = parseInt(document.getElementById('editDurationDays').value) || 0;
+                    const hours = parseInt(document.getElementById('editDurationHours').value) || 0;
+                    const minutes = parseInt(document.getElementById('editDurationMinutes').value) || 0;
+                    
+                    // Validate that at least some duration is specified
+                    if (days === 0 && hours === 0 && minutes === 0) {
+                        showMessage('Please specify a custom duration', 'error');
+                        return;
+                    }
+                    
+                    // Calculate total milliseconds
+                    const totalMs = (days * 24 * 60 * 60 * 1000) + 
+                                   (hours * 60 * 60 * 1000) + 
+                                   (minutes * 60 * 1000);
+                    expiresAt = timestamp + totalMs;
+                } else {
+                    // Use preset durations
+                    switch (status) {
+                        case 'week':
+                            expiresAt = timestamp + (7 * 24 * 60 * 60 * 1000);
+                            break;
+                        case 'month':
+                            expiresAt = timestamp + (30 * 24 * 60 * 60 * 1000);
+                            break;
+                        case 'permanent':
+                            expiresAt = timestamp + (365 * 24 * 60 * 60 * 1000);
+                            break;
+                        default: // active
+                            expiresAt = timestamp + (24 * 60 * 60 * 1000);
+                    }
+                }
+                
+                const updates = {
+                    status: status,
+                    expiresAt: expiresAt,
+                    hwid: hwid || null,
+                    activated: activated
+                };
+                
+                const keyRef = window.dbRef(window.db, `keys/${keyId}`);
+                await window.dbUpdate(keyRef, updates);
+                
+                closeEditModal();
+                showMessage('Key updated successfully', 'success');
+                loadKeys();
+            } catch (error) {
+                console.error('Error updating key:', error);
+                showMessage('Error updating key. Check console for details.', 'error');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        }
+
         function loadKeys() {
             const keysRef = window.dbRef(window.db, 'keys');
             window.dbOnValue(keysRef, (snapshot) => {
@@ -906,19 +1216,29 @@
                         `<td><span style="color: var(--text-secondary); font-size: 12px;">${keyData.generatorIP || 'Unknown'}</span></td>` : 
                         '';
 
-                    // Show delete button only for keys created by this admin
+                    // Show edit and delete buttons only for keys created by this admin
                     let actionsCell = '';
                     if (isAdminIP()) {
-                        // Admins can only delete keys they created
+                        // Admins can only edit/delete keys they created
                         if (keyData.generatorIP === userIP) {
+                            // Escape the keyData JSON for onclick attribute
+                            const escapedKeyData = JSON.stringify(keyData).replace(/"/g, '&quot;');
                             actionsCell = `
                                 <td>
-                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; background: rgba(248, 113, 113, 0.1); border-color: #f87171; color: #f87171;" onclick="deleteKey('${keyData.id}', '${keyData.key}')">
-                                        <svg style="width: 14px; height: 14px; display: inline;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                        Delete
-                                    </button>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; color: #3b82f6;" onclick='editKey("${keyData.id}", "${escapedKeyData}")'>
+                                            <svg style="width: 14px; height: 14px; display: inline;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; background: rgba(248, 113, 113, 0.1); border-color: #f87171; color: #f87171;" onclick="deleteKey('${keyData.id}', '${keyData.key}')">
+                                            <svg style="width: 14px; height: 14px; display: inline;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            Delete
+                                        </button>
+                                    </div>
                                 </td>
                             `;
                         } else {
