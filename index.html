@@ -551,7 +551,7 @@
             <form id="editForm" onsubmit="saveKeyEdit(event)">
                 <div class="form-group">
                     <label class="form-label">Key</label>
-                    <input type="text" class="form-input" id="editKeyValue" readonly>
+                    <input type="text" class="form-input" id="editKeyValue" placeholder="Enter custom key name">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Status</label>
@@ -1046,9 +1046,16 @@
             event.preventDefault();
             
             const keyId = document.getElementById('editKeyId').value;
+            const keyValue = document.getElementById('editKeyValue').value.trim();
             const status = document.getElementById('editKeyStatus').value;
             const hwid = document.getElementById('editKeyHWID').value.trim();
             const activated = document.getElementById('editKeyActivated').value === 'true';
+            
+            // Validate key name
+            if (!keyValue) {
+                showMessage('Key name cannot be empty', 'error');
+                return;
+            }
             
             try {
                 const timestamp = Date.now();
@@ -1089,6 +1096,7 @@
                 }
                 
                 const updates = {
+                    key: keyValue,
                     status: status,
                     expiresAt: expiresAt,
                     hwid: hwid || null,
