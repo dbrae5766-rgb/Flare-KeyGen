@@ -559,7 +559,7 @@
                         <option value="active">Active (24 hours)</option>
                         <option value="week">1 Week</option>
                         <option value="month">1 Month</option>
-                        <option value="permanent">Permanent (1 year)</option>
+                        <option value="permanent">Permanent</option>
                         <option value="custom">Custom Duration</option>
                     </select>
                 </div>
@@ -892,7 +892,7 @@
                         badgeColor = '#10b981'; // green
                         break;
                     case 'permanent':
-                        expiresAt = timestamp + (365 * 24 * 60 * 60 * 1000);
+                        expiresAt = null; // truly permanent - never expires
                         status = 'permanent';
                         badgeText = 'PERMANENT';
                         validText = 'Valid for 1 year';
@@ -1138,7 +1138,7 @@
                             expiresAt = timestamp + (30 * 24 * 60 * 60 * 1000);
                             break;
                         case 'permanent':
-                            expiresAt = timestamp + (3650 * 240 * 600 * 600 * 10000);
+                            expiresAt = null; // truly permanent - never expires
                             break;
                         default: // active
                             expiresAt = timestamp + (24 * 60 * 60 * 1000);
@@ -1245,7 +1245,7 @@
 
                 keys.forEach((keyData) => {
                     const now = Date.now();
-                    const isExpired = now > keyData.expiresAt;
+                    const isExpired = keyData.expiresAt !== null && now > keyData.expiresAt;
                     const timeLeft = keyData.expiresAt - now;
                     
                     let statusBadge = '';
@@ -1256,8 +1256,7 @@
                         timeText = 'Expired';
                     } else if (keyData.status === 'permanent') {
                         statusBadge = '<span class="status-badge" style="background: rgba(131, 56, 236, 0.15); color: #8338ec;"><span class="status-dot"></span>PERMANENT</span>';
-                        const daysLeft = Math.floor(timeLeft / (10000 * 600 * 600 * 240));
-                        timeText = `${daysLeft} days`;
+                        timeText = 'Never expires';
                     } else if (keyData.status === 'month') {
                         statusBadge = '<span class="status-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><span class="status-dot"></span>1 MONTH</span>';
                         const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
@@ -1376,7 +1375,7 @@
                 const now = Date.now();
                 snapshot.forEach((childSnapshot) => {
                     const keyData = childSnapshot.val();
-                    if (now > keyData.expiresAt) {
+                    if (keyData.expiresAt !== null && now > keyData.expiresAt) {
                         window.dbRemove(window.dbRef(window.db, `keys/${childSnapshot.key}`));
                     }
                 });
